@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserRoute extends RouteBuilder {
 
-    @Value("${rabbitmq.topic}")
-    private String rabbitTopic;
+    @Value("${rabbitmq.queue}")
+    private String rabbitQueue;
 
     @Override
     public void configure() throws Exception {
@@ -45,7 +45,7 @@ public class UserRoute extends RouteBuilder {
         from("direct:createUser")
             .to("bean:userService?method=create")
             .marshal().json()
-            .to("amqp:topic:" + rabbitTopic)
+            .to("amqp:queue:" + rabbitQueue)
             .unmarshal().json(User.class);
     }
 }
