@@ -1,8 +1,10 @@
 package br.com.crud.gestaousuario.route;
 
 import br.com.crud.gestaousuario.model.User;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestParamType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,36 +18,65 @@ public class UserRoute extends RouteBuilder {
     public void configure() throws Exception {
         restConfiguration()
             .component("servlet")
-            .bindingMode(RestBindingMode.json);
+            .bindingMode(RestBindingMode.json)
+            .apiContextPath("/api-doc")
+            .apiProperty("api.title", "API de Gestão de Usuários")
+            .apiProperty("api.version", "1.0.0");
 
         rest("/users")
-            .get("/")
+            .tag("Usuários")
+            
+            .get()
                 .description("Listar todos os usuários")
-                .to("bean:userService?method=list")
+                .outType(User[].class)
+                .to("direct:listUsers")
             
             .get("/{id}")
                 .description("Obter um usuário pelo ID")
-                .to("bean:userService?method=get(${header.id})")
+                .param().name("id").type(RestParamType.path).description("O ID do usuário").dataType("integer").endParam()
+                .outType(User.class)
+                .to("direct:getUser")
             
-            .post("/")
+            .post()
                 .description("Criar um novo usuário")
                 .type(User.class)
+                .outType(User.class)
                 .to("direct:createUser")
             
             .put("/{id}")
                 .description("Atualizar um usuário existente")
                 .type(User.class)
-                .to("bean:userService?method=update(${header.id}, ${body})")
+                .param().name("id").type(RestParamType.path).description("O ID do usuário").dataType("integer").endParam()
+                .outType(User.class)
+                .to("direct:updateUser")
             
             .delete("/{id}")
                 .description("Deletar um usuário")
-                .to("bean:userService?method=delete(${header.id})");
+                .param().name("id").type(RestParamType.path).description("O ID do usuário").dataType("integer").endParam()
+                .to("direct:deleteUser");
 
-        // Rota separada para o processo de criação e envio ao RabbitMQ
+        // Implementação das rotas
+        
+        from("direct:listUsers")
+            .to("bean:userService?method=list");
+
+        from("direct:getUser")
+            .to("bean:userService?method=get(${header.id})");
+
         from("direct:createUser")
             .to("bean:userService?method=create")
+            .wireTap("direct:sendToRabbitMQ")
+            .convertBodyTo(User.class); // Garante que o retorno para a API seja o objeto User
+
+        from("direct:sendToRabbitMQ")
+            .setExchangePattern(ExchangePattern.InOnly)
             .marshal().json()
-            .to("amqp:queue:" + rabbitQueue)
-            .unmarshal().json(User.class);
+            .to("amqp:queue:" + rabbitQueue);
+
+        from("direct:updateUser")
+            .to("bean:userService?method=update(${header.id}, ${body})");
+
+        from("direct:deleteUser")
+            .to("bean:userService?method=delete(${header.id})");
     }
 }

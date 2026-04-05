@@ -12,3 +12,14 @@ services:
       RABBITMQ_DEFAULT_PASS: "password123"
     volumes:
       - ./data:/var/lib/rabbitmq
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: asouza2703
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  volumes:
+    pgdata:

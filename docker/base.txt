@@ -1,0 +1,14 @@
+create database user_manager;
+
+CREATE USER user_manage_sis WITH PASSWORD 'users1st';
+
+-- 1. Conceder permissão de conexão ao banco
+GRANT CONNECT ON DATABASE user_manager TO user_manage_sis;
+
+-- 2. Conceder permissão de uso no schema (geralmente 'public')
+GRANT USAGE ON SCHEMA public TO user_manage_sis;
+
+-- 3. Conceder todas as permissões de manipulação de dados e tabelas
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO user_manage_sis;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO user_manage_sis;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO user_manage_sis;
