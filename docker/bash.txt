@@ -8,3 +8,20 @@ rabbitmq:4-management: Imagem oficial que já vem com o plugin de gerenciamento 
 
 
 docker run --name my-postgres -e POSTGRES_PASSWORD=asouza2703 -p 5432:5432 -d postgres
+
+
+Passos para configurar via interface de gerenciamento (UI)
+Acesse a UI: Entre na interface do RabbitMQ, geralmente em http://localhost:15672.
+Criar Exchange:
+Vá na aba Exchanges e clique em Add a new exchange .
+Defina um nome (ex: meu.topico.exchange).
+Em Tipo , selecione tópico .
+Clique em Adicionar troca .
+Criar Filas:
+Vá na aba Queues e clique em Add a new queue .
+Nomeie a fila (ex: fila.1) e clique em Add queue .
+Vincular Fila (Encadernação):
+Clique na exchange criada (passo 2).
+Em Bindings , adicione uma nova ligação para a fila:
+Chave de roteamento : Use *para uma palavra (ex: ordem.criada) ou #para várias palavras (ex: ordem.#).
+Clique em Bind .
