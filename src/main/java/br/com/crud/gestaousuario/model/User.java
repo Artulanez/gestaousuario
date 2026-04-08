@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     private Long id;
     
     @Column(name = "name", nullable = false)
@@ -22,7 +23,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String senha;
     
-    @Column(name = "email",nullable = false, unique = true)
+    @Column(name = "email", nullable = false) // Removido o unique=true aqui
     private String email;
 
     @Column(name = "phone")
