@@ -1,27 +1,8 @@
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4-management
+Crair docekr ActiveMq
 
--d: Roda o container em segundo plano (detached mode).
---name rabbitmq: Define um nome amigável para o container.
--p 5672:5672: Porta para comunicação com o broker (AMQP).
--p 15672:15672: Porta da interface gráfica de gerenciamento.
-rabbitmq:4-management: Imagem oficial que já vem com o plugin de gerenciamento ativado por padrão.
+docker pull apache/activemq-classic
+docker run -d --name activemq -p 61616:61616 -p 8161:8161 apache/activemq-classic
 
-
-docker run --name my-postgres -e POSTGRES_PASSWORD=asouza2703 -p 5432:5432 -d postgres
-
-
-Passos para configurar via interface de gerenciamento (UI)
-Acesse a UI: Entre na interface do RabbitMQ, geralmente em http://localhost:15672.
-Criar Exchange:
-Vá na aba Exchanges e clique em Add a new exchange .
-Defina um nome (ex: meu.topico.exchange).
-Em Tipo , selecione tópico .
-Clique em Adicionar troca .
-Criar Filas:
-Vá na aba Queues e clique em Add a new queue .
-Nomeie a fila (ex: fila.1) e clique em Add queue .
-Vincular Fila (Encadernação):
-Clique na exchange criada (passo 2).
-Em Bindings , adicione uma nova ligação para a fila:
-Chave de roteamento : Use *para uma palavra (ex: ordem.criada) ou #para várias palavras (ex: ordem.#).
-Clique em Bind .
+localhost:8161
+admin
+admin	

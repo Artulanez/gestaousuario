@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserRoute extends RouteBuilder {
 
-    @Value("${rabbitmq.queue}")
-    private String rabbitQueue;
+    @Value("${activemq.topic}")
+    private String activemqTopic;
 
     @Override
     public void configure() throws Exception {
@@ -65,13 +65,13 @@ public class UserRoute extends RouteBuilder {
 
         from("direct:createUser")
             .to("bean:userService?method=create")
-            .wireTap("direct:sendToRabbitMQ")
-            .convertBodyTo(User.class); // Garante que o retorno para a API seja o objeto User
+            .wireTap("direct:sendToActiveMQ")
+            .convertBodyTo(User.class);
 
-        from("direct:sendToRabbitMQ")
+        from("direct:sendToActiveMQ")
             .setExchangePattern(ExchangePattern.InOnly)
             .marshal().json()
-            .to("amqp:queue:" + rabbitQueue);
+            .to("activemq:topic:" + activemqTopic);
 
         from("direct:updateUser")
             .to("bean:userService?method=update(${header.id}, ${body})");
